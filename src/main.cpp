@@ -1,14 +1,15 @@
 #include <iostream>
 #include <sstream>
+#include <fstream>
+#include <vector>
 #include <map>
 #include <algorithm>
 
 using namespace std;
 
 class SequenceGenerator {
-        static const int len = 5;
-        const int start_pos = len - 2;
-        int seq[len];
+        int len, start_pos;
+        vector<int> seq;
         map<int, int> reg;
         int pos;
         bool d = false;
@@ -16,15 +17,16 @@ class SequenceGenerator {
         void move_position(int &s) {
             // move one sequence position left and reset the current step
             seq[pos] = s;
-            s = seq[--pos];
-            if(pos < 0) d = true;
+            if(--pos < 0) {
+                d = true;
+                return;
+            }
+            s = seq[pos];
         }
         void re_order(const int &s) {
             // finish the swap of current numbers and sort all to the right (slow!?)
             seq[reg[seq[pos]]] = s;
-            // reg[s] = reg[seq[pos]];
-            // reg[seq[pos]] = pos;
-            sort(&seq[pos + 1], &seq[len]); // bad because happens all the time
+            sort(seq.begin()+pos+1, seq.end()); // bad because happens all the time
             for(int i=pos; i<len; i++) {
                 reg[seq[i]] = i;
             }
@@ -32,10 +34,12 @@ class SequenceGenerator {
         }
 
     public:
-        SequenceGenerator() {
+        SequenceGenerator(const int &l) {
             // initialize with a monotonously increasing sequence and position map
+            len = l;
+            start_pos = len - 2;
             for(int i=0; i<len; i++) {
-                seq[i] = i + 1;
+                seq.push_back(i + 1);
                 reg[i + 1] = i;
             }
             pos = start_pos;
@@ -61,6 +65,7 @@ class SequenceGenerator {
                 seq[pos]++;
                 if(seq[pos] > len) {
                     move_position(s);
+                    if(d) break;
                 }
                 else if(reg[seq[pos]] > pos) {
                     re_order(s);
@@ -96,9 +101,8 @@ class Card {
             sides[3] = down;
             umbrella = false;
         }
-        Card(bool u) {
+        Card(bool u) : umbrella(u) {
             // initialize card as ubrella (joker)
-            umbrella = u;
         }
         int get_side(const int &s) {
             // get side (0=left, 1=up, 2=right, 3=down)
@@ -123,13 +127,21 @@ class Card {
         }
 };
 
-class Field {
+// class Field {
+//     // with deep copy constructor
+// };
 
-};
+// Field ImportField(const string &file_name) {
+//     // generate card array and base field from CSVs
+// };
+
+// Cards ImportCards(const string &file_name) {
+//     // generate card array and base field from CSVs
+// };
 
 
 int main() {
-    SequenceGenerator s;
+    SequenceGenerator s(5);
     int count = 0;
     while(!s.done()) {
         count++;
