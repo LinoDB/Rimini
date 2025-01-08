@@ -83,6 +83,51 @@ class SequenceGenerator {
         }
 };
 
+class Card {
+    int sides[4] = {0, 0, 0, 0};
+    bool umbrella;
+    int rotation = 0;
+    public:
+        Card(int left, int up, int right, int down) {
+            // initialize card with side values
+            sides[0] = left;
+            sides[1] = up;
+            sides[2] = right;
+            sides[3] = down;
+            umbrella = false;
+        }
+        Card(bool u) {
+            // initialize card as ubrella (joker)
+            umbrella = u;
+        }
+        int get_side(const int &s) {
+            // get side (0=left, 1=up, 2=right, 3=down)
+            return sides[(s + rotation) % 4];
+        }
+        int get_rotation() {
+            // get current rotation (0-3)
+            return rotation;
+        }
+        void rotate() {
+            // rotate the card left
+            rotation = (rotation + 1) % 4;
+        }
+        string print() {
+            // output the sides as a string (left, up, right, down)
+            stringstream s;
+            for(int i=0; i<3; i++) {
+                s << sides[(i + rotation) % 4] << ',';
+            }
+            s << sides[(3 + rotation) % 4];
+            return s.str();
+        }
+};
+
+class Field {
+
+};
+
+
 int main() {
     SequenceGenerator s;
     int count = 0;
@@ -100,4 +145,14 @@ int main() {
         s.next();
     }
     cout << endl << count << " total sequences" << endl;
+    Card card1(true);
+    Card card2(1, 2, 3, 4);
+    cout << "Card 1: " << card1.print() << endl;
+    cout << "Card 2: " << card2.print() << endl;
+    for(int i=0; i<6; i++) {
+        cout << "After " << i << " rotations: " << card2.get_rotation();
+        cout << ", sides: " << card2.print();
+        cout << ", up: " << card2.get_side(1) << endl;
+        card2.rotate();
+    }
 }
