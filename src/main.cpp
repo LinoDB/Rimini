@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <map>
 #include <algorithm>
 
@@ -15,11 +16,8 @@ class SequenceGenerator {
         void move_position(int &s) {
             // move one sequence position left and reset the current step
             seq[pos] = s;
-            pos--;
-            s = seq[pos];
-            if(pos < 0) {
-                d = true;
-            }
+            s = seq[--pos];
+            if(pos < 0) d = true;
         }
         void re_order(const int &s) {
             // finish the swap of current numbers and sort all to the right (slow!?)
@@ -74,6 +72,15 @@ class SequenceGenerator {
             // skip the remaining sequences of the given position
             pos = i;
         }
+        string print() {
+            // return a string of comma the seperated values of the current sequence
+            stringstream s;
+            for(int i=0; i<len-1; i++) {
+                s << seq[i] << ',';
+            }
+            s << seq[len-1];
+            return s.str();
+        }
 };
 
 int main() {
@@ -81,11 +88,7 @@ int main() {
     int count = 0;
     while(!s.done()) {
         count++;
-        // cout << s.get(0);
-        // for(int i=1; i<s.get_length(); i++) {
-        //     cout << ", " << s.get(i);
-        // }
-        // cout << endl;
+        cout << s.print() << endl;
         if(s.get(0) == 3) {
             s.skip(0);
         }
