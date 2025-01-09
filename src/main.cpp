@@ -101,6 +101,14 @@ class Card {
             sides[3] = down;
             umbrella = false;
         }
+        Card(vector<int> inputs) {
+            // initialize card with side values
+            sides[0] = inputs[0];
+            sides[1] = inputs[1];
+            sides[2] = inputs[2];
+            sides[3] = inputs[3];
+            umbrella = false;
+        }
         Card(bool u) : umbrella(u) {
             // initialize card as ubrella (joker)
         }
@@ -135,12 +143,91 @@ class Card {
 //     // generate card array and base field from CSVs
 // };
 
-// Cards ImportCards(const string &file_name) {
-//     // generate card array and base field from CSVs
-// };
+void add_element(vector<int> &arr, const string &s) {
+    if(s[0] == 'N') {
+        arr[0] = 1;
+    }
+    else if(s[0] == 'F') {
+        if(s[1] == 'L') {
+            arr.push_back(1);
+            return;
+        }
+        else if(s[1] == 'U') {
+            arr.push_back(-1);
+            return;
+        }
+    }
+    else if(s[0] == 'M') {
+        if(s[1] == 'L') {
+            arr.push_back(2);
+            return;
+        }
+        else if(s[1] == 'U') {
+            arr.push_back(-2);
+            return;
+        }
+    }
+    arr.push_back(0);
+}
+
+vector<int> split_string(const string &s, const string &delim, const int &start=0, const int &len=0) {
+    vector<int> split = {0};
+    int s_pos = 0;
+    int e_pos;
+    while((e_pos = s.find(delim, s_pos)) != string::npos) {
+        if(s_pos > 0) {
+            add_element(split, s.substr(s_pos, e_pos));
+        }
+        s_pos = e_pos + delim.size();
+    }
+    if(s_pos < s.size()) {
+        add_element(split, s.substr(s_pos, s.size()));
+    }
+
+    while(len > split.size()) {
+        split.push_back(0);
+    }
+    return split;
+}
+
+vector<Card> import_cards(const string &file_name) {
+    vector<Card> cards;
+    string line;
+    string header;
+    ifstream card_csv(file_name);
+
+    getline(card_csv, header);
+    int len = split_string(header, ",").size();
+    if(len < 5) {
+        // make test with linebreak
+        cout << "ERROR: Input file for cards must be at least 5 columns long "
+        "(valid column indices: 1 - 4)" << endl;
+        throw 404;
+    }
+    while(getline (card_csv, line)) {
+        auto line_arr = split_string(line, ",", 1, len);
+        if(line_arr[0]) {
+            cards.push_back(Card(true));
+        }
+        else {
+            cards.push_back(
+                Card(
+                    line_arr[1],
+                    line_arr[2],
+                    line_arr[3],
+                    line_arr[4]
+                )
+            );
+        }
+    }
+
+    card_csv.close(); 
+    return cards;
+};
 
 
 int main() {
+    vector<Card> cards = import_cards("resources/cards.csv");
     SequenceGenerator s(5);
     int count = 0;
     while(!s.done()) {
