@@ -39,8 +39,8 @@ class SequenceGenerator {
             len = l;
             start_pos = len - 2;
             for(int i=0; i<len; i++) {
-                seq.push_back(i + 1);
-                reg[i + 1] = i;
+                seq.push_back(i);
+                reg[i] = i;
             }
             pos = start_pos;
         }
@@ -63,7 +63,7 @@ class SequenceGenerator {
             int s = seq[pos];
             while(true) {
                 seq[pos]++;
-                if(seq[pos] > len) {
+                if(seq[pos] > len - 1) {
                     move_position(s);
                     if(d) break;
                 }
@@ -85,6 +85,9 @@ class SequenceGenerator {
             }
             s << seq[len-1];
             return s.str();
+        }
+        vector<int> get_sequence() {
+            return seq;
         }
 };
 
@@ -157,7 +160,7 @@ class Card {
 class Field {
     vector<vector<Card>> field;
     bool valid = true;
-    int pos_x = 1;
+    int pos_x = 0;
     int pos_y = 1;
     int len;
     public:
@@ -223,14 +226,17 @@ class Field {
             return 4;
         }
         void undo_add() {
+            valid = true;
             field[pos_y][pos_x].set_empty();
-            if(--pos_x == 0) {
-                pos_x = len;
-                if(--pos_y == 0) {
-                    cout << "ERROR: Tried to remove card from an empty field" << endl;
-                    throw 1;
+            do {
+                if(((--pos_x == 0) && !(pos_y == 1)) || (pos_x == -1)) {
+                    pos_x = len;
+                    if(--pos_y == 0) {
+                        cout << "ERROR: Tried to remove card from an empty field" << endl;
+                        throw 1;
+                    }
                 }
-            }
+            } while(!field[pos_y][pos_x].is_empty() && !(pos_x == 0));
         }
         string print_card(const int &y, const int &x) {
             return field[y][x].print();
@@ -249,23 +255,42 @@ class Game {
         bool add_card(Card card) {
             int current_size = fields.size();
             bool check_valid = false;
+            vector<int> moves_made;
             for(int i=0; i<fields.size(); i++) {
                 if(fields[i].is_valid()) {
                     int check = fields[i].add_card(card);
                     if(check < 4) {
                         check_valid = true;
                     }
+                    else {
+                        moves_made.push_back(i);
+                    }
                     if(!card.is_umbrella()) {
                         while(check < 3) {
-                            current_size++;
                             fields.push_back(fields[i]);
                             fields[current_size].undo_add();
-                            check = fields[i].add_card(card, check + 1);
+                            check = fields[current_size++].add_card(
+                                card, check + 1
+                            );
                         }
                     }
                 }
             }
+            if(!check_valid) {
+                for(int move : moves_made) {
+                    fields[move].undo_add();
+                }
+            }
             return check_valid;
+        }
+        vector<Field> get_solutions() {
+            vector<Field> solutions;
+            for(Field field : fields) {
+                if(field.is_valid()) {
+                    solutions.push_back(field);
+                }
+            }
+            return solutions;
         }
 };
 
@@ -399,47 +424,79 @@ vector<Card> import_cards(const string &file_name) {
     return cards;
 };
 
+class Solutions {
+    vector<vector<Field>> solutions;
+    vector<vector<int>> sequences;
+    public:
+        void add_solution(vector<Field> solution, vector<int> sequence) {
+            solutions.push_back(solution);
+            sequences.push_back(sequence);
+        }
+        string print() {
+            stringstream s;
+            if(solutions.size() == 0) {
+                return "No solutions found!\n";
+            }
+            for(int i=0; i<solutions.size(); i++) {
+                for(int k=0; k<sequences[i].size()-1; i++) {
+                    s << sequences[i][k] << ", ";
+                }
+                s << sequences[i][sequences[i].size()-1];
+                s << " - " << solutions[i].size() << " Solutions\n";
+            }
+            return s.str();
+        }
+};
 
 int main() {
     vector<Card> cards = import_cards("resources/cards.csv");
     Field field = import_field("resources/field.csv", 11);
-    cout << "(0, 0): " << field.print_card(0, 0) << endl;
-    cout << "(1, 0): " << field.print_card(1, 0) << endl;
-    cout << "(4, 4): " << field.print_card(4, 4) << endl;
-    cout << "(5, 5): " << field.print_card(5, 5) << endl;
-    cout << "(10, 10): " << field.print_card(10, 10) << endl;
-    cout << "(10, 8): " << field.print_card(10, 8) << endl;
+    Solutions solutions;
+    SequenceGenerator s(72);
 
-    cout << "Card 1: " << cards[0].print() << endl;
-    cout << "Card 31: " << cards[30].print() << endl;
-    cout << "Card 72: " << cards[71].print() << endl;
-
-    SequenceGenerator s(5);
-    int count = 0;
+    int count_0 = 0;
+    int count_1 = 0;
+    cout << "0/72 - 0/72" << endl;
     while(!s.done()) {
-        count++;
-        cout << s.print() << endl;
-        if(s.get(0) == 3) {
-            s.skip(0);
+        Game game(field);
+        int seq = 0;
+        while(true) {        
+            while(!game.add_card(cards[s.get(seq)])) {
+                s.skip(seq);
+                if(seq == 0) {
+                    cout << ++count_0 << "/72 - 0/72" << endl;
+                    count_1 == 0;
+                }
+                else if(seq == 1) {
+                    cout << count_0 << "/72 - " << ++count_1 << "/72" << endl;
+                }
+                s.next();
+            }
+            if(++seq == s.get_length()) {
+                solutions.add_solution(game.get_solutions(), s.get_sequence());
+                s.next();
+                break;
+            }
         }
-        else if (s.get(2) == 2)
-        {
-            s.skip(2);
-        }
-        
-        s.next();
+        // vector<int> sequence = s.get_sequence();
+        // for(int seq=0; seq<sequence.size(); seq++) {
+        //     if(!game.add_card(cards[sequence[seq]])) {
+        //         s.skip(seq);
+        //         if(seq == 0) {
+        //             cout << ++count_0 << "/72 - 0/72" << endl;
+        //             count_1 == 0;
+        //         }
+        //         else if(seq == 1) {
+        //             cout << count_0 << "/72 - " << ++count_1 << "/72" << endl;
+        //         }
+        //         break;
+        //     }
+        //     if(seq == (sequence.size() - 1)) {
+        //         solutions.add_solution(game.get_solutions(), sequence);
+        //         cout << "Solution found: " << s.print() << endl;
+        //     }
+        // }
+        // s.next();
     }
-    cout << endl << count << " total sequences" << endl;
-    Card card1(true);
-    Card card2(1, 2, 3, 4);
-    Card card3;
-    cout << "Card 1: " << card1.print() << endl;
-    cout << "Card 2: " << card2.print() << endl;
-    cout << "Card 3: " << card3.print() << endl;
-    for(int i=0; i<6; i++) {
-        cout << "After " << i << " rotations: " << card2.get_rotation();
-        cout << ", sides: " << card2.print();
-        cout << ", up: " << card2.get_side(1) << endl;
-        card2.rotate();
-    }
+    cout << solutions.print();
 }

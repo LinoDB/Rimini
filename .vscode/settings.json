@@ -10,6 +10,11 @@
         "fstream": "cpp",
         "ostream": "cpp",
         "*.tcc": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "map": "cpp",
+        "iosfwd": "cpp",
+        "memory": "cpp",
+        "istream": "cpp",
+        "functional": "cpp"
     }
 }
