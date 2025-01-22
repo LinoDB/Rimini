@@ -161,7 +161,7 @@ class Field {
     int pos_y = 1;
     int len;
     public:
-        Field(vector<vector<Card>> f, const int &l): field(f), len(l) {}
+        Field(vector<vector<Card>> f): field(f), len(f[0].size()) {}
         bool is_valid() {
             return valid;
         }
@@ -232,6 +232,9 @@ class Field {
                 }
             }
         }
+        string print_card(const int &y, const int &x) {
+            return field[y][x].print();
+        }
 };
 
 class Game {
@@ -240,9 +243,8 @@ class Game {
     vector<Field> fields;
     bool valid = true;
     public:
-        Game(vector<vector<Card>> f) {
-            Field field(f, f[0].size());
-            fields.push_back(field);
+        Game(Field f) {
+            fields.push_back(f);
         }
         bool add_card(Card card) {
             int current_size = fields.size();
@@ -253,21 +255,19 @@ class Game {
                     if(check < 4) {
                         check_valid = true;
                     }
-                    while(check < 3) {
-                        current_size++;
-                        fields.push_back(fields[i]);
-                        fields[current_size].undo_add();
-                        check = fields[i].add_card(card, check + 1);
+                    if(!card.is_umbrella()) {
+                        while(check < 3) {
+                            current_size++;
+                            fields.push_back(fields[i]);
+                            fields[current_size].undo_add();
+                            check = fields[i].add_card(card, check + 1);
+                        }
                     }
                 }
             }
             return check_valid;
         }
 };
-
-// Field ImportField(const string &file_name) {
-//     // generate card array and base field from CSVs
-// };
 
 void add_element(vector<int> &arr, const string &s) {
     if(s[0] == 'N') {
@@ -296,25 +296,66 @@ void add_element(vector<int> &arr, const string &s) {
     arr.push_back(0);
 }
 
-vector<int> split_string(const string &s, const string &delim, const int &start=0, const int &len=0) {
-    vector<int> split = {0};
+vector<string> split_string(const string &s, const string &delim) {
+    vector<string> split;
     int s_pos = 0;
     int e_pos;
     while((e_pos = s.find(delim, s_pos)) != string::npos) {
-        if(s_pos > 0) {
-            add_element(split, s.substr(s_pos, e_pos));
-        }
+        split.push_back(s.substr(s_pos, e_pos - s_pos));
         s_pos = e_pos + delim.size();
     }
     if(s_pos < s.size()) {
-        add_element(split, s.substr(s_pos, s.size()));
-    }
-
-    while(len > split.size()) {
-        split.push_back(0);
+        split.push_back(s.substr(s_pos, s.size()));
     }
     return split;
 }
+
+Field import_field(const string &file_name, const int &size) {
+    vector<Card> empty_row;
+    for(int i=0; i<size; i++) {
+        empty_row.push_back(Card());
+    }
+    vector<vector<Card>> field;
+    for(int i=0; i<size; i++) {
+        field.push_back(empty_row);
+    }
+
+    string line;
+    string header;
+    ifstream field_csv(file_name);
+    getline(field_csv, header);
+    int len = split_string(header, ",").size();
+    if(len < 6) {
+        // make test with linebreak
+        cout << "ERROR: Input file for field must be at least 6 columns long "
+        "(valid column indices: 0 - 5)" << endl;
+        throw 1;
+    }
+    while(getline(field_csv, line)) {
+        auto split = split_string(line, ",");
+        vector<int> line_arr = {0};
+        for(int i=2; i<split.size(); i++) {
+            add_element(line_arr, split[i]);
+        }
+        while(line_arr.size() < 5) {
+            line_arr.push_back(0);
+        }
+        if(line_arr[0]) {
+            field[stoi(split[0])][stoi(split[1])] = Card(true);
+        }
+        else {
+            field[stoi(split[0])][stoi(split[1])] = Card(
+                line_arr[1],
+                line_arr[2],
+                line_arr[3],
+                line_arr[4]
+            );
+        }
+    }
+
+    field_csv.close(); 
+    return Field(field);
+};
 
 vector<Card> import_cards(const string &file_name) {
     vector<Card> cards;
@@ -330,8 +371,15 @@ vector<Card> import_cards(const string &file_name) {
         "(valid column indices: 1 - 4)" << endl;
         throw 1;
     }
-    while(getline (card_csv, line)) {
-        auto line_arr = split_string(line, ",", 1, len);
+    while(getline(card_csv, line)) {
+        auto split = split_string(line, ",");
+        vector<int> line_arr = {0};
+        for(int i=1; i<split.size(); i++) {
+            add_element(line_arr, split[i]);
+        }
+        while(line_arr.size() < 5) {
+            line_arr.push_back(0);
+        }
         if(line_arr[0]) {
             cards.push_back(Card(true));
         }
@@ -354,10 +402,17 @@ vector<Card> import_cards(const string &file_name) {
 
 int main() {
     vector<Card> cards = import_cards("resources/cards.csv");
-    vector<vector<Card>> test_1 = {cards};
-    cout << "Test 1: " << test_1[0][0].print() << ", length: " << test_1[0].size() << endl;
-    Game game_1 = Game(test_1);
-    Game game_2 = game_1;
+    Field field = import_field("resources/field.csv", 11);
+    cout << "(0, 0): " << field.print_card(0, 0) << endl;
+    cout << "(1, 0): " << field.print_card(1, 0) << endl;
+    cout << "(4, 4): " << field.print_card(4, 4) << endl;
+    cout << "(5, 5): " << field.print_card(5, 5) << endl;
+    cout << "(10, 10): " << field.print_card(10, 10) << endl;
+    cout << "(10, 8): " << field.print_card(10, 8) << endl;
+
+    cout << "Card 1: " << cards[0].print() << endl;
+    cout << "Card 31: " << cards[30].print() << endl;
+    cout << "Card 72: " << cards[71].print() << endl;
 
     SequenceGenerator s(5);
     int count = 0;
