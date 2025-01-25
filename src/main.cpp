@@ -56,15 +56,17 @@ class SequenceGenerator {
             // is 'true' when all sequences have been tested
             return d;
         }
-        void next() {
+        int next() {
             // increase the current position until it's either above the sequence
             // length or the value can be found on the right side of the current position
-            if(d) return;
+            if(d) return 0;
+            int moved = 0;
             int s = seq[pos];
             while(true) {
                 seq[pos]++;
                 if(seq[pos] > len - 1) {
                     move_position(s);
+                    moved++;
                     if(d) break;
                 }
                 else if(reg[seq[pos]] > pos) {
@@ -72,6 +74,7 @@ class SequenceGenerator {
                     break;
                 }
             }
+            return moved;
         }
         void skip(const int &i) {
             // skip the remaining sequences of the given position
@@ -159,14 +162,18 @@ class Card {
 
 class Field {
     vector<vector<Card>> field;
-    bool valid = true;
+    bool valid = false;
     int pos_x = 0;
     int pos_y = 1;
     int len;
     public:
-        Field(vector<vector<Card>> f): field(f), len(f[0].size()) {}
+        Field(vector<vector<Card>> f): field(f), len(f[0].size()), valid(true) {}
+        Field() {}
         bool is_valid() {
             return valid;
+        }
+        void make_unvalid() {
+            valid = false;
         }
         bool check_left(Card &card) {
             return (
@@ -196,9 +203,9 @@ class Field {
             if(!valid) return 4;
             card.rotate(start_rotation);
             do {
-                if(++pos_x == len) {
+                if(++pos_x == len + 1) {
                     pos_x = 1;
-                    if(++pos_y == len) {
+                    if(++pos_y == len + 1) {
                         cout << "ERROR: Too many cards added to field" << endl;
                         throw 1;
                     }
@@ -222,11 +229,12 @@ class Field {
                 }
                 card.rotate();
             } while(card.get_rotation() != 0);
-            valid = false;
+            // valid = false;
             return 4;
         }
         void undo_add() {
-            valid = true;
+            // DON'T ALWAYS MAKE TRUE
+            // valid = true;
             field[pos_y][pos_x].set_empty();
             do {
                 if(((--pos_x == 0) && !(pos_y == 1)) || (pos_x == -1)) {
@@ -241,54 +249,84 @@ class Field {
         string print_card(const int &y, const int &x) {
             return field[y][x].print();
         }
+        Card get_current() {
+            return field[pos_y][pos_x];
+        }
 };
 
 class Game {
     // actually make an extra field class and this a vector of field (to loop over)
     // the field class has the 'valid' attribute so there'll be no need to rearrange vectors
-    vector<Field> fields;
+    map<int, Field> fields;
     bool valid = true;
+    int field_count = 0;
     public:
         Game(Field f) {
-            fields.push_back(f);
+            fields[0] = f;
+            field_count++;
         }
         bool add_card(Card card) {
-            int current_size = fields.size();
             bool check_valid = false;
-            vector<int> moves_made;
-            for(int i=0; i<fields.size(); i++) {
+            // vector<int> moves_made;
+            vector<int> keys;
+            for(auto pair : fields) {
+                keys.push_back(pair.first);
+            }
+            for(int i : keys) {
                 if(fields[i].is_valid()) {
                     int check = fields[i].add_card(card);
                     if(check < 4) {
                         check_valid = true;
                     }
-                    else {
-                        moves_made.push_back(i);
-                    }
+                    // else {
+                    //     moves_made.push_back(i);
+                    // }
                     if(!card.is_umbrella()) {
                         while(check < 3) {
-                            fields.push_back(fields[i]);
+                            int current_size = field_count++;
+                            fields[current_size] = fields[i];
                             fields[current_size].undo_add();
-                            check = fields[current_size++].add_card(
+                            check = fields[current_size].add_card(
                                 card, check + 1
                             );
                         }
                     }
                 }
             }
-            if(!check_valid) {
-                for(int move : moves_made) {
-                    fields[move].undo_add();
+            if(check_valid) {
+                vector<int> to_erase;
+                for(auto pair : fields) {
+                    if(pair.second.get_current().is_empty()) {
+                        to_erase.push_back(pair.first);
+                    }
+                }
+                for(int i : to_erase) {
+                    fields.erase(i);
                 }
             }
+            // // NOT NECESSARY, REMOVE moves_made
+            // if(!check_valid) {
+            //     for(int move : moves_made) {
+            //         fields[move].undo_add();
+            //     }
+            // }
             return check_valid;
+        }
+        void remove_cards(const int &n) {
+            if(n > 0) {
+                for(auto pair : fields) {
+                    if(pair.second.is_valid()) {
+                        for(int i=0; i<n; i++) {
+                            fields[pair.first].undo_add();
+                        }
+                    }
+                }
+            }
         }
         vector<Field> get_solutions() {
             vector<Field> solutions;
-            for(Field field : fields) {
-                if(field.is_valid()) {
-                    solutions.push_back(field);
-                }
+            for(auto pair : fields) {
+                solutions.push_back(fields[pair.first]);
             }
             return solutions;
         }
@@ -449,35 +487,74 @@ class Solutions {
 };
 
 int main() {
+    // The sequence interaction is wrong (moves further left than seq)
+    // Update add_cart (see Field)
+
     vector<Card> cards = import_cards("resources/cards.csv");
     Field field = import_field("resources/field.csv", 11);
     Solutions solutions;
     SequenceGenerator s(72);
 
-    int count_0 = 0;
-    int count_1 = 0;
-    cout << "0/72 - 0/72" << endl;
+    // int count_0 = 0;
+    // int count_1 = 0;
+    // cout << "0/72 - 0/72" << endl;
+    Game game(field);
+    int seq = 0;
     while(!s.done()) {
-        Game game(field);
-        int seq = 0;
-        while(true) {        
-            while(!game.add_card(cards[s.get(seq)])) {
-                s.skip(seq);
-                if(seq == 0) {
-                    cout << ++count_0 << "/72 - 0/72" << endl;
-                    count_1 == 0;
-                }
-                else if(seq == 1) {
-                    cout << count_0 << "/72 - " << ++count_1 << "/72" << endl;
-                }
-                s.next();
-            }
-            if(++seq == s.get_length()) {
-                solutions.add_solution(game.get_solutions(), s.get_sequence());
-                s.next();
-                break;
-            }
+        if(!game.add_card(cards[s.get(seq)])) {
+            s.skip(seq);
+            // cout << "Current level: " << seq << endl;
+            // if(seq == 0) {
+            //     cout << ++count_0 << "/72 - 0/72" << endl;
+            //     count_1 == 0;
+            // }
+            // else if(seq == 1) {
+            //     cout << count_0 << "/72 - " << ++count_1 << "/72" << endl;
+            // }
+            int moved = s.next();
+            seq -= moved;
+            game.remove_cards(moved + 1);
         }
+        else if(++seq == s.get_length()) {
+            solutions.add_solution(game.get_solutions(), s.get_sequence());
+            cout << "Solution found: " << s.print() << endl;
+            s.next();
+            // game = Game(field);
+            int moved = s.next();
+            seq -= moved;
+            game.remove_cards(moved + 1);
+        }
+    }
+
+
+    //  while(true) {    
+    //     while(!game.add_card(cards[s.get(seq)])) {
+    //         s.skip(seq);
+    //         // cout << "Current level: " << seq << endl;
+    //         // if(seq == 0) {
+    //         //     cout << ++count_0 << "/72 - 0/72" << endl;
+    //         //     count_1 == 0;
+    //         // }
+    //         // else if(seq == 1) {
+    //         //     cout << count_0 << "/72 - " << ++count_1 << "/72" << endl;
+    //         // }
+    //         int moved = s.next();
+    //         seq -= moved;
+    //         game.remove_cards(moved + 1);
+    //         if(s.done()) break;
+    //     }
+    //     if(s.done()) break;
+    //     if(++seq == s.get_length()) {
+    //         solutions.add_solution(game.get_solutions(), s.get_sequence());
+    //         cout << "Solution found: " << s.print() << endl;
+    //         // int moved = s.next();
+    //         // seq -= moved;
+    //         // game.remove_cards(moved);
+    //         if(s.done()) break;
+    //     }
+    // }
+
+
         // vector<int> sequence = s.get_sequence();
         // for(int seq=0; seq<sequence.size(); seq++) {
         //     if(!game.add_card(cards[sequence[seq]])) {
@@ -497,6 +574,5 @@ int main() {
         //     }
         // }
         // s.next();
-    }
     cout << solutions.print();
 }
