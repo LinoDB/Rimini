@@ -98,23 +98,26 @@ class Card {
     int sides[4] = {0, 0, 0, 0};
     bool umbrella = false;
     bool empty = false;
+    bool base = false;
     int rotation = 0;
     public:
-        Card(int left, int up, int right, int down) {
+        Card(int left, int up, int right, int down, bool b=false) {
             // initialize card with side values
             sides[0] = left;
             sides[1] = up;
             sides[2] = right;
             sides[3] = down;
+            base = b;
         }
-        Card(vector<int> inputs) {
+        Card(vector<int> inputs, bool b=false) {
             // initialize card with side values
             sides[0] = inputs[0];
             sides[1] = inputs[1];
             sides[2] = inputs[2];
             sides[3] = inputs[3];
+            base = b;
         }
-        Card(bool u): umbrella(u) {
+        Card(bool u, bool b=false): umbrella(u), base(b) {
             // initialize card as ubrella (joker)
         }
         Card() {
@@ -155,6 +158,9 @@ class Card {
         bool is_free() {
             return empty | umbrella;
         }
+        bool is_base() {
+            return base;
+        }
         void set_empty() {
             empty = true;
         }
@@ -162,19 +168,18 @@ class Card {
 
 class Field {
     vector<vector<Card>> field;
-    bool valid = false;
+    // bool valid = false;
     int pos_x = 0;
     int pos_y = 1;
-    int len;
+    int len = 0;
+    bool original = true;
+    vector<int> created = {1, 0};
     public:
-        Field(vector<vector<Card>> f): field(f), len(f[0].size()), valid(true) {}
+        Field(vector<vector<Card>> f): field(f), len(f[0].size()) {} //, valid(true)
         Field() {}
-        bool is_valid() {
-            return valid;
-        }
-        void make_unvalid() {
-            valid = false;
-        }
+        // void make_unvalid() {
+        //     valid = false;
+        // }
         bool check_left(Card &card) {
             return (
                 field[pos_y][pos_x-1].is_free() ||
@@ -200,7 +205,7 @@ class Field {
             );
         }
         int add_card(Card card, const int &start_rotation=0) {
-            if(!valid) return 4;
+            // if(!valid) return 4;
             card.rotate(start_rotation);
             do {
                 if(++pos_x == len + 1) {
@@ -210,7 +215,7 @@ class Field {
                         throw 1;
                     }
                 }
-            } while(!field[pos_y][pos_x].is_empty());
+            } while(field[pos_y][pos_x].is_base());
             if(card.is_umbrella()) {
                 field[pos_y][pos_x] = card;
                 return card.get_rotation();
@@ -244,7 +249,7 @@ class Field {
                         throw 1;
                     }
                 }
-            } while(!field[pos_y][pos_x].is_empty() && !(pos_x == 0));
+            } while(field[pos_y][pos_x].is_base() && !(pos_x == 0));
         }
         string print_card(const int &y, const int &x) {
             return field[y][x].print();
@@ -252,13 +257,26 @@ class Field {
         Card get_current() {
             return field[pos_y][pos_x];
         }
+        void update_created() {
+            created[0] = pos_y;
+            created[1] = pos_x;
+        }
+        bool is_valid() {
+            return (((pos_y > created[0]) || ((pos_y == created[0]) && (pos_x > created[1]))) || original);
+        }
+        void mark_not_original() {
+            original = false;
+        }
+        bool is_original() {
+            return original;
+        }
 };
 
 class Game {
     // actually make an extra field class and this a vector of field (to loop over)
     // the field class has the 'valid' attribute so there'll be no need to rearrange vectors
     map<int, Field> fields;
-    bool valid = true;
+    // bool valid = true;
     int field_count = 0;
     public:
         Game(Field f) {
@@ -273,25 +291,28 @@ class Game {
                 keys.push_back(pair.first);
             }
             for(int i : keys) {
-                if(fields[i].is_valid()) {
-                    int check = fields[i].add_card(card);
-                    if(check < 4) {
-                        check_valid = true;
-                    }
-                    // else {
-                    //     moves_made.push_back(i);
-                    // }
-                    if(!card.is_umbrella()) {
-                        while(check < 3) {
-                            int current_size = field_count++;
-                            fields[current_size] = fields[i];
-                            fields[current_size].undo_add();
-                            check = fields[current_size].add_card(
-                                card, check + 1
-                            );
-                        }
+                // if(fields[i].is_valid()) {
+                int check = fields[i].add_card(card);
+                if(check < 4) {
+                    check_valid = true;
+                }
+                // else {
+                //     moves_made.push_back(i);
+                // }
+                if(!card.is_umbrella()) {
+                    while(check < 3) {
+                        // make it exclude symmetrical cards
+                        int current_size = field_count++;
+                        fields[current_size] = fields[i];
+                        fields[current_size].undo_add();
+                        fields[current_size].update_created();
+                        fields[current_size].mark_not_original();
+                        check = fields[current_size].add_card(
+                            card, check + 1
+                        );
                     }
                 }
+                // }
             }
             if(check_valid) {
                 vector<int> to_erase;
@@ -301,7 +322,9 @@ class Game {
                     }
                 }
                 for(int i : to_erase) {
-                    fields.erase(i);
+                    if(!fields[i].is_original()) {
+                        fields.erase(i);
+                    }
                 }
             }
             // // NOT NECESSARY, REMOVE moves_made
@@ -315,11 +338,22 @@ class Game {
         void remove_cards(const int &n) {
             if(n > 0) {
                 for(auto pair : fields) {
-                    if(pair.second.is_valid()) {
-                        for(int i=0; i<n; i++) {
-                            fields[pair.first].undo_add();
-                        }
+                    // if(pair.second.is_valid()) {
+                    for(int i=0; i<n; i++) {
+                        fields[pair.first].undo_add();
                     }
+                    // }
+                }
+            }
+            if(n > 1) {
+                vector<int> to_erase;
+                for(auto pair : fields) {
+                    if(!pair.second.is_valid()) {
+                        to_erase.push_back(pair.first);
+                    }
+                }
+                for(int i : to_erase) {
+                    fields.erase(i);
                 }
             }
         }
@@ -329,6 +363,12 @@ class Game {
                 solutions.push_back(fields[pair.first]);
             }
             return solutions;
+        }
+        int get_size() {
+            return fields.size();
+        }
+        int get_number_of_fields() {
+            return field_count;
         }
 };
 
@@ -404,14 +444,15 @@ Field import_field(const string &file_name, const int &size) {
             line_arr.push_back(0);
         }
         if(line_arr[0]) {
-            field[stoi(split[0])][stoi(split[1])] = Card(true);
+            field[stoi(split[0])][stoi(split[1])] = Card(true, true);
         }
         else {
             field[stoi(split[0])][stoi(split[1])] = Card(
                 line_arr[1],
                 line_arr[2],
                 line_arr[3],
-                line_arr[4]
+                line_arr[4],
+                true
             );
         }
     }
@@ -493,35 +534,47 @@ int main() {
     vector<Card> cards = import_cards("resources/cards.csv");
     Field field = import_field("resources/field.csv", 11);
     Solutions solutions;
-    SequenceGenerator s(72);
+    SequenceGenerator s(cards.size());
 
     // int count_0 = 0;
     // int count_1 = 0;
-    // cout << "0/72 - 0/72" << endl;
+    // cout << "0/71 - 0/71" << endl;
+    // int count = 0;
     Game game(field);
     int seq = 0;
+    cout << "Size debug: " << cards.size() << endl;
     while(!s.done()) {
+        // if((count % 100000) == 0) {
+        //     cout << "Rounds: " << count << endl;
+        //     cout << "Seq: " << seq << endl;
+        //     cout << "Current number of fields: " << game.get_size() << endl;
+        //     cout << "Total number of fields: " << game.get_number_of_fields() << endl;
+        //     cout << "Current sequence: " << s.print() << endl;
+        // }
+        // count++;
         if(!game.add_card(cards[s.get(seq)])) {
             s.skip(seq);
             // cout << "Current level: " << seq << endl;
             // if(seq == 0) {
-            //     cout << ++count_0 << "/72 - 0/72" << endl;
+            //     cout << ++count_0 << "/71 - 0/71" << endl;
             //     count_1 == 0;
             // }
             // else if(seq == 1) {
-            //     cout << count_0 << "/72 - " << ++count_1 << "/72" << endl;
+            //     cout << count_0 << "/71 - " << ++count_1 << "/71" << endl;
             // }
             int moved = s.next();
             seq -= moved;
             game.remove_cards(moved + 1);
         }
-        else if(++seq == s.get_length()) {
-            solutions.add_solution(game.get_solutions(), s.get_sequence());
-            cout << "Solution found: " << s.print() << endl;
-            s.next();
-            // game = Game(field);
+        else if(++seq == s.get_length() - 1) {
+            if(game.add_card(cards[s.get(seq)])) {
+                solutions.add_solution(game.get_solutions(), s.get_sequence());
+                cout << "Solution found: " << s.print() << endl;
+                // s.next();
+                // game = Game(field);
+            }
             int moved = s.next();
-            seq -= moved;
+            seq -= moved + 1;
             game.remove_cards(moved + 1);
         }
     }
@@ -574,5 +627,17 @@ int main() {
         //     }
         // }
         // s.next();
+    cout << "DONE" << endl;
+    cout << s.print() << endl;
     cout << solutions.print();
 }
+
+/*
+    - Only sort if going right (if possible?) -> minimize sorting
+    - Minimize rotations by defining card types
+     (no need to rotate after finding a solution for 4 equals or symmetric
+     cards -> there is always at least a card left and up anyways)
+    - Re-assign indices of the map from time to time
+    - Optimize where possible
+    - Make it run parallel
+*/
