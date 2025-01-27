@@ -34,7 +34,7 @@ class SequenceGenerator {
         }
 
     public:
-        SequenceGenerator(const int &l) {
+        SequenceGenerator(const int l) {
             // initialize with a monotonously increasing sequence and position map
             len = l;
             start_pos = len - 2;
@@ -99,23 +99,26 @@ class Card {
     bool umbrella = false;
     bool empty = false;
     bool base = false;
+    bool second_rotation = false;
     int rotation = 0;
     public:
-        Card(int left, int up, int right, int down, bool b=false) {
+        Card(int left, int up, int right, int down, bool b=false, bool s_r=false) {
             // initialize card with side values
             sides[0] = left;
             sides[1] = up;
             sides[2] = right;
             sides[3] = down;
             base = b;
+            second_rotation = s_r;
         }
-        Card(vector<int> inputs, bool b=false) {
+        Card(vector<int> inputs, bool b=false, bool s_r=false) {
             // initialize card with side values
             sides[0] = inputs[0];
             sides[1] = inputs[1];
             sides[2] = inputs[2];
             sides[3] = inputs[3];
             base = b;
+            second_rotation = s_r;
         }
         Card(bool u, bool b=false): umbrella(u), base(b) {
             // initialize card as ubrella (joker)
@@ -163,6 +166,9 @@ class Card {
         }
         void set_empty() {
             empty = true;
+        }
+        bool needs_second_rotation() {
+            return second_rotation;
         }
 };
 
@@ -299,9 +305,8 @@ class Game {
                 // else {
                 //     moves_made.push_back(i);
                 // }
-                if(!card.is_umbrella()) {
+                if(!card.is_umbrella() && card.needs_second_rotation()) {
                     while(check < 3) {
-                        // make it exclude symmetrical cards
                         int current_size = field_count++;
                         fields[current_size] = fields[i];
                         fields[current_size].undo_add();
@@ -413,6 +418,17 @@ vector<string> split_string(const string &s, const string &delim) {
     return split;
 }
 
+bool test_three_equals(const vector<int> &line) {
+    int count = 0;
+    for(int i=2; i<5; i++) {
+        count += line[1] != line[i];
+    }
+    if(count == 1) {
+        return true;
+    }
+    return false;
+}
+
 Field import_field(const string &file_name, const int &size) {
     vector<Card> empty_row;
     for(int i=0; i<size; i++) {
@@ -493,7 +509,9 @@ vector<Card> import_cards(const string &file_name) {
                     line_arr[1],
                     line_arr[2],
                     line_arr[3],
-                    line_arr[4]
+                    line_arr[4],
+                    false,
+                    test_three_equals(line_arr)
                 )
             );
         }
@@ -634,9 +652,6 @@ int main() {
 
 /*
     - Only sort if going right (if possible?) -> minimize sorting
-    - Minimize rotations by defining card types
-     (no need to rotate after finding a solution for 4 equals or symmetric
-     cards -> there is always at least a card left and up anyways)
     - Re-assign indices of the map from time to time
     - Optimize where possible
     - Make it run parallel
