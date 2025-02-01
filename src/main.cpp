@@ -284,6 +284,20 @@ class Game {
     map<int, Field> fields;
     // bool valid = true;
     int field_count = 0;
+    void reset_count() {
+        vector<int> keys;
+        for(auto pair: fields) {
+            keys.push_back(pair.first);
+        }
+        int count = 0;
+        for(int key: keys) {
+            // use this to check if copying works properly!!! - and do research!
+            Field field = fields[key];
+            fields.erase(key);
+            fields[count++] = field;
+        }
+        field_count = fields.size();
+    }
     public:
         Game(Field f) {
             fields[0] = f;
@@ -298,6 +312,9 @@ class Game {
             }
             for(int i : keys) {
                 // if(fields[i].is_valid()) {
+                if(field_count > 10000000) {
+                    reset_count();
+                }
                 int check = fields[i].add_card(card);
                 if(check < 4) {
                     check_valid = true;
@@ -360,6 +377,9 @@ class Game {
                 for(int i : to_erase) {
                     fields.erase(i);
                 }
+            }
+            if(fields.empty()) {
+                cout << "Reached 0 fields :(" << endl;
             }
         }
         vector<Field> get_solutions() {
@@ -557,19 +577,36 @@ int main() {
     // int count_0 = 0;
     // int count_1 = 0;
     // cout << "0/71 - 0/71" << endl;
-    // int count = 0;
+    int count = 0;
     Game game(field);
     int seq = 0;
+    s.next();
+    s.skip(0);
+    s.next();
+    s.skip(0);
+    s.next();
+    s.skip(0);
+    s.next();
+    s.skip(0);
+    s.next();
+    s.skip(0);
+    s.next();
+    s.skip(0);
+    s.next();
+    s.skip(0);
+    s.next();
+    s.skip(0);
+    s.next();
     cout << "Size debug: " << cards.size() << endl;
     while(!s.done()) {
-        // if((count % 100000) == 0) {
-        //     cout << "Rounds: " << count << endl;
-        //     cout << "Seq: " << seq << endl;
-        //     cout << "Current number of fields: " << game.get_size() << endl;
-        //     cout << "Total number of fields: " << game.get_number_of_fields() << endl;
-        //     cout << "Current sequence: " << s.print() << endl;
-        // }
-        // count++;
+        if((count % 100000) == 0) {
+            cout << "Rounds: " << count << endl;
+            cout << "Seq: " << seq << endl;
+            cout << "Current number of fields: " << game.get_size() << endl;
+            cout << "Total number of fields: " << game.get_number_of_fields() << endl;
+            cout << "Current sequence: " << s.print() << endl;
+        }
+        count++;
         if(!game.add_card(cards[s.get(seq)])) {
             s.skip(seq);
             // cout << "Current level: " << seq << endl;
