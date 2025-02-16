@@ -4,7 +4,7 @@
             "name": "g++ debug file",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${cwd}/out/main.exe",
+            "program": "${cwd}/out/Rimini.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

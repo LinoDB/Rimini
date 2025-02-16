@@ -9,7 +9,7 @@
                 "-g",
                 "src/*.cpp",
                 "-o",
-                "${cwd}/out/main.exe",
+                "${cwd}/out/Rimini.exe",
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
