@@ -11,15 +11,15 @@
 
 using namespace std;
 
-Field import_field(const string &file_name, const int &size);
-
-vector<Card> import_cards(const string &file_name);
-
-bool test_three_equals(const vector<int> &line);
+void add_element(vector<int> &arr, const string &s);
 
 vector<string> split_string(const string &s, const string &delim);
 
-void add_element(vector<int> &arr, const string &s);
+bool test_three_equals(const vector<int> &line);
+
+vector<Card> import_cards(const string &file_name);
+
+Field import_field(const string &file_name, const int &size);
 
 
 int main() {
