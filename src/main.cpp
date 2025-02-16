@@ -11,6 +11,146 @@
 
 using namespace std;
 
+Field import_field(const string &file_name, const int &size);
+
+vector<Card> import_cards(const string &file_name);
+
+bool test_three_equals(const vector<int> &line);
+
+vector<string> split_string(const string &s, const string &delim);
+
+void add_element(vector<int> &arr, const string &s);
+
+
+int main() {
+    // The sequence interaction is wrong (moves further left than seq)
+    // Update add_cart (see Field)
+
+    vector<Card> cards = import_cards("resources/cards.csv");
+    Field field = import_field("resources/field.csv", 11);
+    Solutions solutions;
+    SequenceGenerator s(cards.size());
+
+    // int count_0 = 0;
+    // int count_1 = 0;
+    // cout << "0/71 - 0/71" << endl;
+    int count = 0;
+    Game game(field);
+    int seq = 0;
+    s.next();
+    s.skip(0);
+    s.next();
+    s.skip(0);
+    s.next();
+    s.skip(0);
+    s.next();
+    s.skip(0);
+    s.next();
+    s.skip(0);
+    s.next();
+    s.skip(0);
+    s.next();
+    s.skip(0);
+    s.next();
+    s.skip(0);
+    s.next();
+    cout << "Size debug: " << cards.size() << endl;
+    while(!s.done()) {
+        if((count % 100000) == 0) {
+            cout << "Rounds: " << count << endl;
+            cout << "Seq: " << seq << endl;
+            cout << "Current number of fields: " << game.get_size() << endl;
+            cout << "Total number of fields: " << game.get_number_of_fields() << endl;
+            cout << "Current sequence: " << s.print() << endl;
+        }
+        count++;
+        if(!game.add_card(cards[s.get(seq)])) {
+            s.skip(seq);
+            // cout << "Current level: " << seq << endl;
+            // if(seq == 0) {
+            //     cout << ++count_0 << "/71 - 0/71" << endl;
+            //     count_1 == 0;
+            // }
+            // else if(seq == 1) {
+            //     cout << count_0 << "/71 - " << ++count_1 << "/71" << endl;
+            // }
+            int moved = s.next();
+            seq -= moved;
+            game.remove_cards(moved + 1);
+        }
+        else if(++seq == s.get_length() - 1) {
+            if(game.add_card(cards[s.get(seq)])) {
+                solutions.add_solution(game.get_solutions(), s.get_sequence());
+                cout << "Solution found: " << s.print() << endl;
+                // s.next();
+                // game = Game(field);
+            }
+            int moved = s.next();
+            seq -= moved + 1;
+            game.remove_cards(moved + 1);
+        }
+    }
+
+
+    //  while(true) {    
+    //     while(!game.add_card(cards[s.get(seq)])) {
+    //         s.skip(seq);
+    //         // cout << "Current level: " << seq << endl;
+    //         // if(seq == 0) {
+    //         //     cout << ++count_0 << "/72 - 0/72" << endl;
+    //         //     count_1 == 0;
+    //         // }
+    //         // else if(seq == 1) {
+    //         //     cout << count_0 << "/72 - " << ++count_1 << "/72" << endl;
+    //         // }
+    //         int moved = s.next();
+    //         seq -= moved;
+    //         game.remove_cards(moved + 1);
+    //         if(s.done()) break;
+    //     }
+    //     if(s.done()) break;
+    //     if(++seq == s.get_length()) {
+    //         solutions.add_solution(game.get_solutions(), s.get_sequence());
+    //         cout << "Solution found: " << s.print() << endl;
+    //         // int moved = s.next();
+    //         // seq -= moved;
+    //         // game.remove_cards(moved);
+    //         if(s.done()) break;
+    //     }
+    // }
+
+
+        // vector<int> sequence = s.get_sequence();
+        // for(int seq=0; seq<sequence.size(); seq++) {
+        //     if(!game.add_card(cards[sequence[seq]])) {
+        //         s.skip(seq);
+        //         if(seq == 0) {
+        //             cout << ++count_0 << "/72 - 0/72" << endl;
+        //             count_1 == 0;
+        //         }
+        //         else if(seq == 1) {
+        //             cout << count_0 << "/72 - " << ++count_1 << "/72" << endl;
+        //         }
+        //         break;
+        //     }
+        //     if(seq == (sequence.size() - 1)) {
+        //         solutions.add_solution(game.get_solutions(), sequence);
+        //         cout << "Solution found: " << s.print() << endl;
+        //     }
+        // }
+        // s.next();
+    cout << "DONE" << endl;
+    cout << s.print() << endl;
+    cout << solutions.print();
+}
+
+/*
+    - Only sort if going right (if possible?) -> minimize sorting
+    - Re-assign indices of the map from time to time
+    - Optimize where possible
+    - Make it run parallel
+*/
+
 void add_element(vector<int> &arr, const string &s) {
     // convert card side types to ints
     if(s[0] == 'N') {
@@ -158,133 +298,3 @@ Field import_field(const string &file_name, const int &size) {
     field_csv.close(); 
     return Field(field);
 };
-
-
-int main() {
-    // The sequence interaction is wrong (moves further left than seq)
-    // Update add_cart (see Field)
-
-    vector<Card> cards = import_cards("resources/cards.csv");
-    Field field = import_field("resources/field.csv", 11);
-    Solutions solutions;
-    SequenceGenerator s(cards.size());
-
-    // int count_0 = 0;
-    // int count_1 = 0;
-    // cout << "0/71 - 0/71" << endl;
-    int count = 0;
-    Game game(field);
-    int seq = 0;
-    s.next();
-    s.skip(0);
-    s.next();
-    s.skip(0);
-    s.next();
-    s.skip(0);
-    s.next();
-    s.skip(0);
-    s.next();
-    s.skip(0);
-    s.next();
-    s.skip(0);
-    s.next();
-    s.skip(0);
-    s.next();
-    s.skip(0);
-    s.next();
-    cout << "Size debug: " << cards.size() << endl;
-    while(!s.done()) {
-        if((count % 100000) == 0) {
-            cout << "Rounds: " << count << endl;
-            cout << "Seq: " << seq << endl;
-            cout << "Current number of fields: " << game.get_size() << endl;
-            cout << "Total number of fields: " << game.get_number_of_fields() << endl;
-            cout << "Current sequence: " << s.print() << endl;
-        }
-        count++;
-        if(!game.add_card(cards[s.get(seq)])) {
-            s.skip(seq);
-            // cout << "Current level: " << seq << endl;
-            // if(seq == 0) {
-            //     cout << ++count_0 << "/71 - 0/71" << endl;
-            //     count_1 == 0;
-            // }
-            // else if(seq == 1) {
-            //     cout << count_0 << "/71 - " << ++count_1 << "/71" << endl;
-            // }
-            int moved = s.next();
-            seq -= moved;
-            game.remove_cards(moved + 1);
-        }
-        else if(++seq == s.get_length() - 1) {
-            if(game.add_card(cards[s.get(seq)])) {
-                solutions.add_solution(game.get_solutions(), s.get_sequence());
-                cout << "Solution found: " << s.print() << endl;
-                // s.next();
-                // game = Game(field);
-            }
-            int moved = s.next();
-            seq -= moved + 1;
-            game.remove_cards(moved + 1);
-        }
-    }
-
-
-    //  while(true) {    
-    //     while(!game.add_card(cards[s.get(seq)])) {
-    //         s.skip(seq);
-    //         // cout << "Current level: " << seq << endl;
-    //         // if(seq == 0) {
-    //         //     cout << ++count_0 << "/72 - 0/72" << endl;
-    //         //     count_1 == 0;
-    //         // }
-    //         // else if(seq == 1) {
-    //         //     cout << count_0 << "/72 - " << ++count_1 << "/72" << endl;
-    //         // }
-    //         int moved = s.next();
-    //         seq -= moved;
-    //         game.remove_cards(moved + 1);
-    //         if(s.done()) break;
-    //     }
-    //     if(s.done()) break;
-    //     if(++seq == s.get_length()) {
-    //         solutions.add_solution(game.get_solutions(), s.get_sequence());
-    //         cout << "Solution found: " << s.print() << endl;
-    //         // int moved = s.next();
-    //         // seq -= moved;
-    //         // game.remove_cards(moved);
-    //         if(s.done()) break;
-    //     }
-    // }
-
-
-        // vector<int> sequence = s.get_sequence();
-        // for(int seq=0; seq<sequence.size(); seq++) {
-        //     if(!game.add_card(cards[sequence[seq]])) {
-        //         s.skip(seq);
-        //         if(seq == 0) {
-        //             cout << ++count_0 << "/72 - 0/72" << endl;
-        //             count_1 == 0;
-        //         }
-        //         else if(seq == 1) {
-        //             cout << count_0 << "/72 - " << ++count_1 << "/72" << endl;
-        //         }
-        //         break;
-        //     }
-        //     if(seq == (sequence.size() - 1)) {
-        //         solutions.add_solution(game.get_solutions(), sequence);
-        //         cout << "Solution found: " << s.print() << endl;
-        //     }
-        // }
-        // s.next();
-    cout << "DONE" << endl;
-    cout << s.print() << endl;
-    cout << solutions.print();
-}
-
-/*
-    - Only sort if going right (if possible?) -> minimize sorting
-    - Re-assign indices of the map from time to time
-    - Optimize where possible
-    - Make it run parallel
-*/
