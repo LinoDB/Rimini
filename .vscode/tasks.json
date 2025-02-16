@@ -2,14 +2,14 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "C/C++: g++.exe build active file",
-            "command": "C:\\msys64\\ucrt64\\bin\\g++.exe",
+            "label": "C/C++: g++.exe build file",
+            "command": "C:/msys64/ucrt64/bin/g++.exe",
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "src\\main.cpp", // "${file}",
+                "src/*.cpp",
                 "-o",
-                "${cwd}\\out\\main.exe", // ${fileBasenameNoExtension}.exe"
+                "${cwd}/out/main.exe",
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
