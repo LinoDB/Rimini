@@ -2,8 +2,8 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "C/C++: g++.exe build file",
-            "command": "C:/msys64/ucrt64/bin/g++.exe",
+            "label": "C/C++: g++ build file",
+            "command": "g++",
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
