@@ -30,7 +30,6 @@ int main() {
     Field field = import_field("resources/field.csv", 11);
     Solutions solutions;
     SequenceGenerator s(cards.size());
-
     // int count_0 = 0;
     // int count_1 = 0;
     // cout << "0/71 - 0/71" << endl;
@@ -157,7 +156,7 @@ vector<Card> import_cards(const string &file_name) {
     int len = split_string(header, ",").size();
     if(len < 5) {
         // make test with linebreak
-        cout << "ERROR: Input file for cards must be at least 5 columns long "
+        cerr << "ERROR: Input file for cards must be at least 5 columns long "
         "(valid column indices: 1 - 4)" << endl;
         throw 1;
     }
@@ -208,7 +207,7 @@ Field import_field(const string &file_name, const int &size) {
     getline(field_csv, header);
     int len = split_string(header, ",").size();
     if(len < 6) {
-        cout << "ERROR: Input file for field must be at least 6 columns long "
+        cerr << "ERROR: Input file for field must be at least 6 columns long "
         "(valid column indices: 0 - 5)" << endl;
         throw 1;
     }
@@ -230,7 +229,8 @@ Field import_field(const string &file_name, const int &size) {
                 line_arr[2],
                 line_arr[3],
                 line_arr[4],
-                true
+                true,
+                test_three_equals(line_arr)
             );
         }
     }

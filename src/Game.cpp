@@ -25,7 +25,7 @@ Game::Game(Field f) {
 bool Game::add_card(Card card) {
     // add a card to all current fields
     bool check_valid = false;
-    if(field_count > 100000) {
+    if(field_count > 10000) {
         reset_count();
     }
     vector<int> keys;

@@ -42,10 +42,10 @@ int Field::add_card(Card card, const int &start_rotation) {
     // add a card to the next position of the field
     card.rotate(start_rotation);
     do {
-        if(++pos_x == len + 1) {
-            pos_x = 1;
-            if(++pos_y == len + 1) {
-                cout << "ERROR: Too many cards added to field" << endl;
+        if(++pos_x == len - 1) {
+            pos_x = 0;
+            if(++pos_y == len - 1) {
+                cerr << "ERROR: Too many cards added to field" << endl;
                 throw 1;
             }
         }
@@ -73,16 +73,20 @@ int Field::add_card(Card card, const int &start_rotation) {
 
 void Field::undo_add() {
     // remove the last added card (turn it empty and move the field back)
+    if(field[pos_y][pos_x].is_base()) {
+        cerr << "ERROR: Tried to remove a base card from the field" << endl;
+        throw 1;
+    }
     field[pos_y][pos_x].set_empty();
     do {
-        if(((--pos_x == 0) && !(pos_y == 1)) || (pos_x == -1)) {
-            pos_x = len;
+        if((--pos_x == -1)) {
+            pos_x = len - 2;
             if(--pos_y == 0) {
-                cout << "ERROR: Tried to remove card from an empty field" << endl;
+                cerr << "ERROR: Tried to remove card from an empty field" << endl;
                 throw 1;
             }
         }
-    } while(field[pos_y][pos_x].is_base() && !(pos_x == 0));
+    } while(field[pos_y][pos_x].is_base());
 }
 
 string Field::print_card(const int &y, const int &x) {
