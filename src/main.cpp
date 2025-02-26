@@ -55,11 +55,11 @@ int main() {
     // s.next();
     cout << "Size debug: " << cards.size() << endl << endl;
     while(!s.done()) {
-        if((count % 1000000) == 0) {
+        if((count % 10000000) == 0) {
             cout << "Rounds: " << count << endl;
-            cout << "Seq: " << seq << endl;
-            cout << "Current number of fields: " << game.get_size() << endl;
-            cout << "Total number of fields: " << game.get_number_of_fields() << endl;
+            // cout << "Seq: " << seq << endl;
+            // cout << "Current number of fields: " << game.get_size() << endl;
+            // cout << "Total number of fields: " << game.get_number_of_fields() << endl;
             cout << s.print() << endl << endl;
         }
         count++;
