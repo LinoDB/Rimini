@@ -86,7 +86,7 @@ void Field::undo_add() {
                 throw 1;
             }
         }
-    } while(field[pos_y][pos_x].is_base());
+    } while(field[pos_y][pos_x].is_base() && !(pos_x == 0 && pos_y == 1));
 }
 
 string Field::print_card(const int &y, const int &x) {
