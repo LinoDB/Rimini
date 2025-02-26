@@ -74,7 +74,7 @@ int main() {
             cout << "Solution found: " << s.print() << endl;
             int moved = s.next();
             seq -= moved + 1;
-            game.remove_cards(moved);
+            game.remove_cards(moved + 1);
         }
     }
 
