@@ -37,23 +37,23 @@ int main() {
     int count = 0;
     Game game(field);
     int seq = 0;
-    s.next();
-    s.skip(0);
-    s.next();
-    s.skip(0);
-    s.next();
-    s.skip(0);
-    s.next();
-    s.skip(0);
-    s.next();
-    s.skip(0);
-    s.next();
-    s.skip(0);
-    s.next();
-    s.skip(0);
-    s.next();
-    s.skip(0);
-    s.next();
+    // s.next();
+    // s.skip(0);
+    // s.next();
+    // s.skip(0);
+    // s.next();
+    // s.skip(0);
+    // s.next();
+    // s.skip(0);
+    // s.next();
+    // s.skip(0);
+    // s.next();
+    // s.skip(0);
+    // s.next();
+    // s.skip(0);
+    // s.next();
+    // s.skip(0);
+    // s.next();
     cout << "Size debug: " << cards.size() << endl;
     while(!s.done()) {
         if((count % 1000000) == 0) {
@@ -66,14 +66,6 @@ int main() {
         count++;
         if(!game.add_card(cards[s.get(seq)])) {
             s.skip(seq);
-            // cout << "Current level: " << seq << endl;
-            // if(seq == 0) {
-            //     cout << ++count_0 << "/71 - 0/71" << endl;
-            //     count_1 == 0;
-            // }
-            // else if(seq == 1) {
-            //     cout << count_0 << "/71 - " << ++count_1 << "/71" << endl;
-            // }
             int moved = s.next();
             seq -= moved;
             game.remove_cards(moved + 1);
@@ -87,54 +79,6 @@ int main() {
         }
     }
 
-
-    //  while(true) {    
-    //     while(!game.add_card(cards[s.get(seq)])) {
-    //         s.skip(seq);
-    //         // cout << "Current level: " << seq << endl;
-    //         // if(seq == 0) {
-    //         //     cout << ++count_0 << "/72 - 0/72" << endl;
-    //         //     count_1 == 0;
-    //         // }
-    //         // else if(seq == 1) {
-    //         //     cout << count_0 << "/72 - " << ++count_1 << "/72" << endl;
-    //         // }
-    //         int moved = s.next();
-    //         seq -= moved;
-    //         game.remove_cards(moved + 1);
-    //         if(s.done()) break;
-    //     }
-    //     if(s.done()) break;
-    //     if(++seq == s.get_length()) {
-    //         solutions.add_solution(game.get_solutions(), s.get_sequence());
-    //         cout << "Solution found: " << s.print() << endl;
-    //         // int moved = s.next();
-    //         // seq -= moved;
-    //         // game.remove_cards(moved);
-    //         if(s.done()) break;
-    //     }
-    // }
-
-
-        // vector<int> sequence = s.get_sequence();
-        // for(int seq=0; seq<sequence.size(); seq++) {
-        //     if(!game.add_card(cards[sequence[seq]])) {
-        //         s.skip(seq);
-        //         if(seq == 0) {
-        //             cout << ++count_0 << "/72 - 0/72" << endl;
-        //             count_1 == 0;
-        //         }
-        //         else if(seq == 1) {
-        //             cout << count_0 << "/72 - " << ++count_1 << "/72" << endl;
-        //         }
-        //         break;
-        //     }
-        //     if(seq == (sequence.size() - 1)) {
-        //         solutions.add_solution(game.get_solutions(), sequence);
-        //         cout << "Solution found: " << s.print() << endl;
-        //     }
-        // }
-        // s.next();
     cout << "DONE" << endl;
     cout << s.print() << endl;
     cout << solutions.print();
