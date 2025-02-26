@@ -8,14 +8,13 @@ void Game::reset_count() {
     for(auto pair: fields) {
         keys.push_back(pair.first);
     }
-    int count = 0;
+    field_count = 0;
     for(int key: keys) {
         // use this to check if copying works properly!!! - and do research!
         Field field = fields[key];
         fields.erase(key);
-        fields[count++] = field;
+        fields[field_count++] = field;
     }
-    field_count = fields.size();
 }
 
 Game::Game(Field f) {
@@ -26,14 +25,14 @@ Game::Game(Field f) {
 bool Game::add_card(Card card) {
     // add a card to all current fields
     bool check_valid = false;
+    if(field_count > 10000) {
+        reset_count();
+    }
     vector<int> keys;
     for(auto pair : fields) {
         keys.push_back(pair.first);
     }
     for(int i : keys) {
-        if(field_count > 10000000) {
-            reset_count();
-        }
         int check = fields[i].add_card(card);
         if(check < 4) {
             check_valid = true;
