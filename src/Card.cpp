@@ -1,7 +1,16 @@
 #include "Card.h"
+#include <map>
 #include <sstream>
 
 using namespace std;
+
+map<int, string> legend = {
+    {0, " N"},
+    {1, "FL"},
+    {-1, "FU"},
+    {2, "ML"},
+    {-2, "MU"},
+};
 
 Card::Card(int left, int up, int right, int down, bool b, bool s_r) {
     // initialize card with side values
@@ -56,10 +65,10 @@ string Card::print() {
     // output the sides as a string (left, up, right, down)
     stringstream s;
     for(int i=0; i<4; i++) {
-        s << sides[(i + rotation) % 4] << ',';
+        s << legend.at(sides[(i + rotation) % 4]) << ", ";
     }
-    s << " umbrella: " << umbrella << ", empty: " << empty;
-    s << ", free: " << (empty | umbrella);
+    s << "umbrella: " << umbrella << ", empty: " << empty;
+    s << ", base: " << base << ", s_r: " << second_rotation;
     return s.str();
 }
 

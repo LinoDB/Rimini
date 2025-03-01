@@ -11,6 +11,8 @@
 
 using namespace std;
 
+void print_entire_solution(Field &solution);
+
 void add_element(vector<int> &arr, const string &s);
 
 vector<string> split_string(const string &s, const string &delim);
@@ -71,6 +73,7 @@ int main() {
         }
         else if(++seq == s.get_length()) {
             solutions.add_solution(game.get_solutions(), s.get_sequence());
+            print_entire_solution(game.get_solutions()[0]);
             cout << "Solution found: " << s.print() << endl;
             int moved = s.next();
             seq -= moved + 1;
@@ -84,11 +87,25 @@ int main() {
 }
 
 /*
-    - Only sort if going right (if possible?) -> minimize sorting
-    - Re-assign indices of the map from time to time
-    - Optimize where possible
+    - UNIT TESTING TO BE SURE THERE ARE NO BUGS
+      (there are empty cards that aren't empty in some places e.g.)
+    - Run down a fixed order that causes more conflicts (left to right is minum
+      conflicts -> cause 4-way fits)
+    - Refine sequence generator (?)
     - Make it run parallel
 */
+
+void print_entire_solution(Field &solution) {
+    vector<int> created = solution.get_created();
+    cout << "Original field: " << solution.is_original() << ", Created: ("
+        << created[0] << ", " << created[1] << ')' << endl;
+    for(int y=1; y<10; y++) {
+        for(int x=1; x<10; x++) {
+            cout << "Row " << y << ", Col " << x << ": " << 
+                solution.print_card(y, x) << endl;
+        }
+    }
+}
 
 void add_element(vector<int> &arr, const string &s) {
     // convert card side types to ints

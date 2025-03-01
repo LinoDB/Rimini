@@ -44,6 +44,8 @@ class Field {
         // track when this card was created
         void update_created();
 
+        vector<int> get_created();
+
         bool is_valid();
 
         void mark_not_original();

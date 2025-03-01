@@ -103,6 +103,10 @@ void Field::update_created() {
     created[1] = pos_x;
 }
 
+vector<int> Field::get_created() {
+    return created;
+}
+
 bool Field::is_valid() {
     return (((pos_y > created[0]) || ((pos_y == created[0]) && (pos_x > created[1]))) || original);
 }
