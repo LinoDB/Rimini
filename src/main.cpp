@@ -187,11 +187,12 @@ vector<Card> import_cards(const string &file_name) {
             line_arr.push_back(0);
         }
         if(line_arr[0]) {
-            cards.push_back(Card(true));
+            cards.push_back(Card(stoi(split[0]), true));
         }
         else {
             cards.push_back(
                 Card(
+                    stoi(split[0]),
                     line_arr[1],
                     line_arr[2],
                     line_arr[3],
@@ -238,16 +239,17 @@ Field import_field(const string &file_name, const int &size) {
             line_arr.push_back(0);
         }
         if(line_arr[0]) {
-            field[stoi(split[0])][stoi(split[1])] = Card(true, true);
+            field[stoi(split[0])][stoi(split[1])] = Card(-1, true, true);
         }
         else {
             field[stoi(split[0])][stoi(split[1])] = Card(
+                -1,
                 line_arr[1],
                 line_arr[2],
                 line_arr[3],
                 line_arr[4],
                 true,
-                test_three_equals(line_arr)
+                false
             );
         }
     }

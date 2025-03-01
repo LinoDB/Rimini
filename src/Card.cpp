@@ -12,8 +12,9 @@ map<int, string> legend = {
     {-2, "MU"},
 };
 
-Card::Card(int left, int up, int right, int down, bool b, bool s_r) {
+Card::Card(int id, int left, int up, int right, int down, bool b, bool s_r) {
     // initialize card with side values
+    card_id = id;
     sides[0] = left;
     sides[1] = up;
     sides[2] = right;
@@ -22,8 +23,9 @@ Card::Card(int left, int up, int right, int down, bool b, bool s_r) {
     second_rotation = s_r;
 }
 
-Card::Card(vector<int> inputs, bool b, bool s_r) {
+Card::Card(int id, vector<int> inputs, bool b, bool s_r) {
     // initialize card with side values
+    card_id = id;
     sides[0] = inputs[0];
     sides[1] = inputs[1];
     sides[2] = inputs[2];
@@ -32,7 +34,7 @@ Card::Card(vector<int> inputs, bool b, bool s_r) {
     second_rotation = s_r;
 }
 
-Card::Card(bool u, bool b): umbrella(u), base(b) {
+Card::Card(int id, bool u, bool b): card_id(id), umbrella(u), base(b) {
     // initialize card as ubrella (joker)
 }
 
@@ -64,6 +66,7 @@ void Card::rotate(const int &r) {
 string Card::print() {
     // output the sides as a string (left, up, right, down)
     stringstream s;
+    s << "Card " << ((0 <= card_id && card_id < 10) ? " " : "") << card_id << ": ";
     for(int i=0; i<4; i++) {
         s << legend.at(sides[(i + rotation) % 4]) << ", ";
     }

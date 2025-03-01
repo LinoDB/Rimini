@@ -13,15 +13,16 @@ class Card {
     bool base = false;
     bool second_rotation = false;
     int rotation = 0;
+    int card_id = 0;
     public:
         // initialize card with side values
-        Card(int left, int up, int right, int down, bool b=false, bool s_r=false);
+        Card(int id, int left, int up, int right, int down, bool b=false, bool s_r=false);
 
         // initialize card with side values
-        Card(vector<int> inputs, bool b=false, bool s_r=false);
+        Card(int id, vector<int> inputs, bool b=false, bool s_r=false);
 
         // initialize card as ubrella (joker)
-        Card(bool u, bool b=false);
+        Card(int id, bool u, bool b=false);
 
         // initialize empty card
         Card();
