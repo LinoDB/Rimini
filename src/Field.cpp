@@ -115,6 +115,10 @@ void Field::mark_not_original() {
     original = false;
 }
 
+void Field::make_original() {
+    original = true;
+}
+
 bool Field::is_original() {
     return original;
 }

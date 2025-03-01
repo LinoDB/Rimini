@@ -52,15 +52,20 @@ bool Game::add_card(Card card) {
     }
     if(check_valid) {
         vector<int> to_erase;
+        vector<int> not_to_erase;
         for(auto pair : fields) {
             if(pair.second.get_current().is_empty()) {
                 to_erase.push_back(pair.first);
             }
+            else {
+                not_to_erase.push_back(pair.first);
+            }
         }
         for(int i : to_erase) {
-            if(!fields[i].is_original()) {
-                fields.erase(i);
+            if(fields[i].is_original()) {
+                fields[not_to_erase[0]].make_original();
             }
+            fields.erase(i);
         }
     }
     return check_valid;

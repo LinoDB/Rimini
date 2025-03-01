@@ -50,6 +50,8 @@ class Field {
 
         void mark_not_original();
 
+        void make_original();
+
         bool is_original();
 };
 

@@ -58,11 +58,13 @@ int main() {
     cout << "Size debug: " << cards.size() << endl << endl;
     while(!s.done()) {
         if((count % 10000000) == 0) {
-            cout << "Rounds: " << count << endl;
+            cout << "Rounds: " << count << ", Seq: " << seq <<
+                ", Fields: " << game.get_size() << endl;
             // cout << "Seq: " << seq << endl;
             // cout << "Current number of fields: " << game.get_size() << endl;
             // cout << "Total number of fields: " << game.get_number_of_fields() << endl;
             cout << s.print() << endl << endl;
+            // print_entire_solution(game.get_solutions()[0]);
         }
         count++;
         if(!game.add_card(cards[s.get(seq)])) {
@@ -101,7 +103,7 @@ void print_entire_solution(Field &solution) {
         << created[0] << ", " << created[1] << ')' << endl;
     for(int y=1; y<10; y++) {
         for(int x=1; x<10; x++) {
-            cout << "Row " << y << ", Col " << x << ": " << 
+            cout << "(" << y << "," << x << ") " << 
                 solution.print_card(y, x) << endl;
         }
     }
