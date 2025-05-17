@@ -57,7 +57,7 @@ int main() {
     // s.next();
     cout << "Size debug: " << cards.size() << endl << endl;
     while(!s.done()) {
-        if((count % 10000000) == 0) {
+        if((count % 1000000) == 0) {
             cout << "Rounds: " << count << ", Seq: " << seq <<
                 ", Fields: " << game.get_size() << endl;
             // cout << "Seq: " << seq << endl;

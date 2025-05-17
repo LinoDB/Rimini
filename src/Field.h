@@ -9,9 +9,7 @@ using namespace std;
 
 class Field {
     vector<vector<Card>> field;
-    int pos_x = 0;
-    int pos_y = 1;
-    int len = 0;
+    int pos = 0;
     bool original = true;
     vector<int> created = {1, 0};
     vector<vector<int>> field_order = {
