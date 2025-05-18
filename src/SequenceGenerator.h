@@ -43,7 +43,7 @@ public:
     void skip(const int &i);
 
     // return a string of comma the seperated values of the current sequence
-    string print();
+    string print(const int &s_pos);
 
     // return the current sequence
     vector<int> get_sequence();

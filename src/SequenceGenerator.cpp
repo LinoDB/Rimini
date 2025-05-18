@@ -74,11 +74,16 @@ void SequenceGenerator::skip(const int &i) {
     pos = i;
 }
 
-string SequenceGenerator::print() {
+string SequenceGenerator::print(const int &s_pos) {
     // return a string of comma the seperated values of the current sequence
     stringstream s;
     for(int i=0; i<len-1; i++) {
-        s << seq[i] << ',';
+        if(i == s_pos) {
+            s << "\033[31m" << seq[i] << "\033[0m,";
+        }
+        else {
+            s << seq[i] << ',';
+        }
     }
     s << seq[len-1];
     return s.str();

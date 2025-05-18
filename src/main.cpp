@@ -57,13 +57,13 @@ int main() {
     // s.next();
     cout << "Size debug: " << cards.size() << endl << endl;
     while(!s.done()) {
-        if((count % 1000000) == 0) {
-            cout << "Rounds: " << count << ", Seq: " << seq <<
+        if((count % 10000000) == 0) {
+            cout << "Rounds: " << count <<
                 ", Fields: " << game.get_size() << endl;
             // cout << "Seq: " << seq << endl;
             // cout << "Current number of fields: " << game.get_size() << endl;
             // cout << "Total number of fields: " << game.get_number_of_fields() << endl;
-            cout << s.print() << endl << endl;
+            cout << s.print(seq) << endl << endl;
             // print_entire_solution(game.get_solutions()[0]);
         }
         count++;
@@ -76,7 +76,7 @@ int main() {
         else if(++seq == s.get_length()) {
             solutions.add_solution(game.get_solutions(), s.get_sequence());
             print_entire_solution(game.get_solutions()[0]);
-            cout << "Solution found: " << s.print() << endl;
+            cout << "Solution found: " << s.print(-1) << endl;
             int moved = s.next();
             seq -= moved + 1;
             game.remove_cards(moved + 1);
@@ -84,7 +84,7 @@ int main() {
     }
 
     cout << "DONE" << endl;
-    cout << s.print() << endl;
+    cout << s.print(-1) << endl;
     cout << solutions.print();
 }
 
