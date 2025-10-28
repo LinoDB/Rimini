@@ -1,7 +1,7 @@
 {
     "tasks": [
         {
-            "type": "cppbuild",
+            "type": "shell",
             "label": "C/C++: g++ build file",
             "command": "g++",
             "args": [
@@ -9,14 +9,11 @@
                 "-g",
                 "src/**",
                 "-o",
-                "${cwd}/out/Rimini.exe",
+                "${cwd}/out/Rimini",
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
             },
-            "problemMatcher": [
-                "$gcc"
-            ],
             "group": {
                 "kind": "build",
                 "isDefault": true
