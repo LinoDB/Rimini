@@ -1,13 +1,15 @@
-#include <iostream>
-#include <sstream>
+#include <chrono>
 #include <fstream>
+#include <iostream>
+#include <thread>
 #include <vector>
-#include <map>
 #include "SequenceGenerator.h"
 #include "Card.h"
 #include "Field.h"
 #include "Game.h"
 #include "Solutions.h"
+
+#define TOTAL_THREADS 12
 
 using namespace std;
 
@@ -21,50 +23,49 @@ bool test_three_equals(const vector<int> &line);
 
 vector<Card> import_cards(const string &file_name);
 
+void find_solution(vector<Card> cards, Field field, const int &num, const float &total, bool *finished);
+
 Field import_field(const string &file_name, const int &size);
 
-
 int main() {
-    // The sequence interaction is wrong (moves further left than seq)
-    // Update add_cart (see Field)
-
     vector<Card> cards = import_cards("resources/cards.csv");
     Field field = import_field("resources/field.csv", 11);
+    cout << "Card count: " << cards.size() << endl << endl;
+    cout << "Thread count: " << TOTAL_THREADS << endl << endl;
+    if(cards.size() < TOTAL_THREADS) {
+        cerr << "ERROR: Use less threads than card count" << endl;
+        throw 1;
+    }
+    bool finished = false;
+    vector<thread*> threads;
+    for(int i = 0; i < TOTAL_THREADS; i++) {
+        threads.push_back(new thread(find_solution, cards, field, i, TOTAL_THREADS, &finished));
+        this_thread::sleep_for(chrono::milliseconds(990 / TOTAL_THREADS));
+    }
+    for(thread* t : threads) {
+        t->join();
+    }
+}
+
+void find_solution(vector<Card> cards, Field field, const int &num, const float &total, bool *finished) {
     Solutions solutions;
     SequenceGenerator s(cards.size());
-    // int count_0 = 0;
-    // int count_1 = 0;
-    // cout << "0/71 - 0/71" << endl;
+    const int starting = cards.size() * (num / total);
+    int ending = cards.size() * ((num + 1) / total);
+    ending = ending == cards.size() ? ending + 1: ending;
+    cout << "Running thread " << num << " from cards " << starting << " to " << ending << endl;
+    for(int i = 0; i < starting; i++) {
+        s.skip(0);
+        s.next();
+    }
     int count = 0;
     Game game(field);
     int seq = 0;
-    // s.next();
-    // s.skip(0);
-    // s.next();
-    // s.skip(0);
-    // s.next();
-    // s.skip(0);
-    // s.next();
-    // s.skip(0);
-    // s.next();
-    // s.skip(0);
-    // s.next();
-    // s.skip(0);
-    // s.next();
-    // s.skip(0);
-    // s.next();
-    // s.skip(0);
-    // s.next();
-    cout << "Size debug: " << cards.size() << endl << endl;
-    while(!s.done()) {
+    while(!s.done() && s.get(0) < ending && !*finished) {
         if((count % 10000000) == 0) {
-            cout << "Rounds: " << count <<
+            cout << "Thread: " << num << ", Rounds: " << count <<
                 ", Fields: " << game.get_size() << endl;
-            // cout << "Seq: " << seq << endl;
-            // cout << "Current number of fields: " << game.get_size() << endl;
-            // cout << "Total number of fields: " << game.get_number_of_fields() << endl;
             cout << s.print(seq) << endl << endl;
-            // print_entire_solution(game.get_solutions()[0]);
         }
         count++;
         if(!game.add_card(cards[s.get(seq)])) {
@@ -77,15 +78,16 @@ int main() {
             solutions.add_solution(game.get_solutions(), s.get_sequence());
             print_entire_solution(game.get_solutions()[0]);
             cout << "Solution found: " << s.print(-1) << endl;
+            *finished = true;
             int moved = s.next();
             seq -= moved + 1;
             game.remove_cards(moved + 1);
         }
     }
 
-    cout << "DONE" << endl;
-    cout << s.print(-1) << endl;
-    cout << solutions.print();
+    // cout << "DONE" << endl;
+    // cout << s.print(-1) << endl;
+    // cout << solutions.print();
 }
 
 /*
