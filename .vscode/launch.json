@@ -7,27 +7,8 @@
       "program": "${cwd}/out/Rimini",
       "args": [],
       "cwd": "${workspaceFolder}",
-      "preLaunchTask": "C/C++: g++ build file"
+      "preLaunchTask": "g++ build file"
     },
-    {
-      "name": "C/C++ Runner: Debug Session",
-      "type": "cppdbg",
-      "request": "launch",
-      "args": [],
-      "stopAtEntry": false,
-      "externalConsole": false,
-      "cwd": "/home/archlino/Documents/Repos/Rimini/src",
-      "program": "/home/archlino/Documents/Repos/Rimini/src/build/Debug/outDebug",
-      "MIMode": "gdb",
-      "miDebuggerPath": "gdb",
-      "setupCommands": [
-        {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        }
-      ]
-    }
   ],
   "version": "2.0.0"
 }
