@@ -3,7 +3,7 @@
 
 #include <sstream>
 #include <vector>
-#include <map>
+#include <set>
 #include <algorithm>
 
 using namespace std;
@@ -13,7 +13,7 @@ class SequenceGenerator {
     int pos;
     int start_pos;
     vector<int> seq;
-    vector<int> reg;
+    set<int> reg;
     bool d = false;
 
     // move one sequence position left and reset the current step

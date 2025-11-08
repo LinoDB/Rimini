@@ -9,16 +9,19 @@ void SequenceGenerator::move_position(int &s) {
         d = true;
         return;
     }
+    reg.insert(s);
     s = seq[pos];
 }
 
 void SequenceGenerator::re_order(const int &s) {
     // finish the swap of current numbers and sort all to the right (slow!?)
-    seq[reg[seq[pos]]] = s;
-    sort(seq.begin()+pos+1, seq.end()); // bad because happens all the time
-    for(int i=pos; i<len; i++) {
-        reg[seq[i]] = i;
+    reg.erase(seq[pos]);
+    reg.insert(s);
+    for(int i : reg) {
+        seq[++pos] = i;
     }
+    reg.clear();
+    reg.insert(seq[len-1]);
     pos = start_pos;
 }
 
@@ -28,8 +31,8 @@ SequenceGenerator::SequenceGenerator(const int l) {
     start_pos = len - 2;
     for(int i=0; i<len; i++) {
         seq.push_back(i);
-        reg.push_back(i);
     }
+    reg.insert(len-1);
     pos = start_pos;
 }
 
@@ -61,7 +64,7 @@ int SequenceGenerator::next() {
             moved++;
             if(d) break;
         }
-        else if(reg[seq[pos]] > pos) {
+        else if(reg.contains(seq[pos])) {
             re_order(s);
             break;
         }
@@ -71,6 +74,12 @@ int SequenceGenerator::next() {
 
 void SequenceGenerator::skip(const int &i) {
     // skip the remaining sequences of the given position
+    for(int n = i+1; n<=pos; n++) {
+        reg.insert(seq[n]);
+    }
+    for(int n = pos+1; n<=i; n++) {
+        reg.erase(seq[n]);
+    }
     pos = i;
 }
 
