@@ -28,7 +28,7 @@ SequenceGenerator::SequenceGenerator(const int l) {
     start_pos = len - 2;
     for(int i=0; i<len; i++) {
         seq.push_back(i);
-        reg[i] = i;
+        reg.push_back(i);
     }
     pos = start_pos;
 }

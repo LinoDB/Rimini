@@ -13,7 +13,7 @@ class SequenceGenerator {
     int pos;
     int start_pos;
     vector<int> seq;
-    map<int, int> reg;
+    vector<int> reg;
     bool d = false;
 
     // move one sequence position left and reset the current step
