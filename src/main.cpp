@@ -156,19 +156,21 @@ vector<string> split_string(const string &s, const string &delim) {
 
 bool test_three_equals(const vector<int> &line) {
     // check if a card has 3 equal sides (in this case multiple fitting rotations matter)
-    int count = 0;
-    for(int i=2; i<5; i++) {
-        count += line[1] != line[i];
-    }
-    if(count == 1) return true;
-    else if(count == 3) {
-        count = 0;
-        for(int i=3; i<5; i++) {
-            count += line[2] != line[i];
-        }
-        if(count == 0) return true;
-    }
-    return false;
+    // -> this is only true if at least 2 sides have to match
+    return true;
+    // int count = 0;
+    // for(int i=2; i<5; i++) {
+    //     count += line[1] != line[i];
+    // }
+    // if(count == 1) return true;
+    // else if(count == 3) {
+    //     count = 0;
+    //     for(int i=3; i<5; i++) {
+    //         count += line[2] != line[i];
+    //     }
+    //     if(count == 0) return true;
+    // }
+    // return false;
 }
 
 vector<Card> import_cards(const string &file_name) {
