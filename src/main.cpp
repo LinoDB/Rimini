@@ -160,8 +160,13 @@ bool test_three_equals(const vector<int> &line) {
     for(int i=2; i<5; i++) {
         count += line[1] != line[i];
     }
-    if(count == 1) {
-        return true;
+    if(count == 1) return true;
+    else if(count == 3) {
+        count = 0;
+        for(int i=3; i<5; i++) {
+            count += line[2] != line[i];
+        }
+        if(count == 0) return true;
     }
     return false;
 }
