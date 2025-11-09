@@ -48,6 +48,8 @@ int Field::add_card(Card card, const int &start_rotation) {
     pos++;
     if(card.is_umbrella()) {
         field[field_order[pos][0]][field_order[pos][1]] = card;
+        card_ids.insert(card.get_id());
+        check_cards_valid();
         return card.get_rotation();
     }
     do {
@@ -60,6 +62,8 @@ int Field::add_card(Card card, const int &start_rotation) {
             )
         ) {
             field[field_order[pos][0]][field_order[pos][1]] = card;
+            card_ids.insert(card.get_id());
+            check_cards_valid();
             return card.get_rotation();
         }
         card.rotate();
@@ -74,7 +78,9 @@ void Field::undo_add() {
         throw 1;
     }
     field[field_order[pos][0]][field_order[pos][1]].set_empty();
+    card_ids.erase(field[field_order[pos][0]][field_order[pos][1]].get_id());
     pos--;
+    check_cards_valid(true);
 }
 
 string Field::print_card(const int &y, const int &x) {
@@ -93,6 +99,19 @@ void Field::update_created() {
 
 vector<int> Field::get_created() {
     return created;
+}
+
+void Field::check_cards_valid(const bool &removed) {
+    if(card_ids.size() != pos + 1) {
+        for(int y=1; y<10; y++) {
+            for(int x=1; x<10; x++) {
+                cout << "(" << y << "," << x << ") " << 
+                    print_card(y, x) << endl;
+            }
+        }
+        cerr << "ERROR: Card was added double on remove " << removed << endl;
+        throw 1;
+    }
 }
 
 bool Field::is_valid() {

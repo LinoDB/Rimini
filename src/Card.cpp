@@ -53,6 +53,11 @@ int Card::get_rotation() {
     return rotation;
 }
 
+int Card::get_id() {
+    // get card Id
+    return card_id;
+}
+
 void Card::rotate() {
     // rotate the card left
     rotation = (rotation + 1) % 4;

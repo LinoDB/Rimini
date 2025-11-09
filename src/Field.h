@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include "Card.h"
+#include <set>
 
 using namespace std;
 
@@ -11,6 +12,7 @@ class Field {
     vector<vector<Card>> field;
     int pos = -1;
     bool original = true;
+    set<int> card_ids;
     vector<int> created = {1, 0};
     vector<vector<int>> field_order = {
         {2, 1},
@@ -124,6 +126,8 @@ class Field {
         void update_created();
 
         vector<int> get_created();
+
+        void check_cards_valid(const bool &removed=false);
 
         bool is_valid();
 

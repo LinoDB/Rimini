@@ -76,7 +76,7 @@ void Game::remove_cards(const int &n) {
     if(n > 0) {
         for(auto pair : fields) {
             for(int i=0; i<n; i++) {
-                fields[pair.first].undo_add();
+                pair.second.undo_add();
             }
         }
     }
@@ -100,7 +100,7 @@ vector<Field> Game::get_solutions() {
     // get all fields
     vector<Field> solutions;
     for(auto pair : fields) {
-        solutions.push_back(fields[pair.first]);
+        solutions.push_back(pair.second);
     }
     return solutions;
 }

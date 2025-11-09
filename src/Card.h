@@ -33,6 +33,9 @@ class Card {
         // get current rotation (0-3)
         int get_rotation();
 
+        // get card Id
+        int get_id();
+
         // rotate the card left
         void rotate();
 

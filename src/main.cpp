@@ -10,7 +10,7 @@
 #include "Game.h"
 #include "Solutions.h"
 
-#define TOTAL_THREADS 12
+#define TOTAL_THREADS 1
 #define ROUNDS 5
 #define ROUND_CHECK 10000000
 
