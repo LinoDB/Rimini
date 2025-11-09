@@ -1,6 +1,7 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <string>
 #include <thread>
 #include <vector>
 #include "SequenceGenerator.h"
@@ -10,6 +11,8 @@
 #include "Solutions.h"
 
 #define TOTAL_THREADS 12
+#define ROUNDS 5
+#define ROUND_CHECK 10000000
 
 using namespace std;
 
@@ -61,11 +64,25 @@ void find_solution(vector<Card> cards, Field field, const int &num, const float 
     int count = 0;
     Game game(field);
     int seq = 0;
+    int first_val = s.get(0);
+    int first_count = 0;
     while(!s.done() && s.get(0) < ending && !*finished) {
-        if((count % 10000000) == 0) {
+        if((count % ROUND_CHECK) == 0) {
+            string skipped = "";
+            if(first_val != s.get(0)) {
+                first_count = 0;
+                first_val = s.get(0);
+            }
+            if(first_count++ == ROUNDS) {
+                first_count = 0;
+                skipped = ", Skipping start number: " + to_string(first_val);
+                s.skip(0);
+                s.next();
+                first_val = s.get(0);
+            }
             cout << "Thread: " << num << ", Rounds: " << count <<
                 ", Fields: " << game.get_size() << endl;
-            cout << s.print(seq) << endl << endl;
+            cout << s.print(seq) << skipped << endl << endl;
         }
         count++;
         if(!game.add_card(cards[s.get(seq)])) {
