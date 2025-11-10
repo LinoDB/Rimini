@@ -1,13 +1,22 @@
 {
   "configurations": [
     {
-      "name": "g++ debug file",
+      "name": "compile and run",
       "type": "lldb",
       "request": "launch",
       "program": "${cwd}/out/Rimini",
       "args": [],
       "cwd": "${workspaceFolder}",
-      "preLaunchTask": "g++ build file"
+      "preLaunchTask": "compile build"
+    },
+    {
+      "name": "compile and test",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${cwd}/out/tests",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "compile tests",
     },
   ],
   "version": "2.0.0"

@@ -2,7 +2,7 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "g++ build file",
+            "label": "compile build",
             "command": "g++",
             "args": [
                 "-std=c++20",
@@ -11,6 +11,26 @@
                 "src/**",
                 "-o",
                 "${cwd}/out/Rimini",
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+        },
+        {
+            "type": "shell",
+            "label": "compile tests",
+            "command": "g++",
+            "args": [
+                "-std=c++20",
+                "-fdiagnostics-color=always",
+                "-g",
+                "test/**",
+                "-o",
+                "${cwd}/out/tests",
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
