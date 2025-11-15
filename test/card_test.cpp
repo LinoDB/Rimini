@@ -142,5 +142,5 @@ bool card::run_tests() {
     vector<int> rot = card::check_rotation();
     vector<int> all = {init[0]+rot[0], init[1]+rot[1]};
     cout << "Card tests finished [" << all[0] << "/" << all[1] << "]\n";
-    return all[0] != all[1];
+    return all[0] == all[1];
 }
