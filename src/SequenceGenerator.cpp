@@ -1,4 +1,5 @@
 #include "SequenceGenerator.h"
+#include <sstream>
 
 using namespace std;
 
@@ -85,7 +86,12 @@ string SequenceGenerator::print(const int &s_pos) {
             s << seq[i] << ',';
         }
     }
-    s << seq[len-1];
+    if(len-1 == s_pos) {
+        s << "\033[31m" << seq[len-1] << "\033[0m";
+    }
+    else {
+        s << seq[len-1];
+    }
     return s.str();
 }
 

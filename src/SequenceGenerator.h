@@ -1,7 +1,7 @@
 #ifndef SEQUENCE_GENERATOR_H_
 #define SEQUENCE_GENERATOR_H_
 
-#include <sstream>
+#include <string>
 #include <vector>
 #include <map>
 #include <algorithm>
