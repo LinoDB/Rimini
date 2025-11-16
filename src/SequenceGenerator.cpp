@@ -3,18 +3,10 @@
 
 using namespace std;
 
-void SequenceGenerator::move_position(int &s) {
-    // move one sequence position left and reset the current step
-    seq[pos] = s;
-    if(--pos < 0) {
-        d = true;
-        return;
-    }
-    s = seq[pos];
-}
-
 void SequenceGenerator::re_order(const int &s) {
-    // finish the swap of current numbers and sort all to the right (slow!?)
+    // finish the swap of current number 's' with the new number
+    // sort all to the right and update their position in req (slow!)
+    // reset to the starting position
     seq[reg[seq[pos]]] = s;
     sort(seq.begin()+pos+1, seq.end()); // bad because happens all the time
     for(int i=pos; i<len; i++) {
@@ -25,6 +17,7 @@ void SequenceGenerator::re_order(const int &s) {
 
 SequenceGenerator::SequenceGenerator(const int l) {
     // initialize with a monotonously increasing sequence and position map
+    // from 0 to l - 1
     len = l;
     start_pos = len - 2;
     for(int i=0; i<len; i++) {
@@ -52,17 +45,31 @@ bool SequenceGenerator::done() {
 int SequenceGenerator::next() {
     // increase the current position until it's either above the sequence
     // length or the value can be found on the right side of the current position
+    // return the positions that were moved to the right during the process
     if(d) return 0;
     int moved = 0;
     int s = seq[pos];
     while(true) {
-        seq[pos]++;
+        seq[pos]++; // increase current value
         if(seq[pos] > len - 1) {
-            move_position(s);
-            moved++;
-            if(d) break;
+            // end of sequence reached, there is no bigger number on the right-hand side
+            // move to the left until the new start value 'seq[pos]' is smaller
+            // than the old start value's'
+            seq[pos] = s;
+            while(true) {
+                moved++;
+                if(--pos < 0) {
+                    d = true;
+                    return moved;
+                }
+                if(seq[pos] < s) break;
+                s = seq[pos];
+            }
+            s = seq[pos];
         }
         else if(reg[seq[pos]] > pos) {
+            // if the current number is found on the right side, switch it with
+            // the previous value s and reset the internal position 'pos'
             re_order(s);
             break;
         }
@@ -76,7 +83,8 @@ void SequenceGenerator::skip(const int &i) {
 }
 
 string SequenceGenerator::print(const int &s_pos) {
-    // return a string of comma the seperated values of the current sequence
+    // return a string of comma the seperated values of the current sequence with
+    // the given position 's_pos' colored red
     stringstream s;
     for(int i=0; i<len-1; i++) {
         if(i == s_pos) {

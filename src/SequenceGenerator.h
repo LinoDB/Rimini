@@ -16,9 +16,6 @@ class SequenceGenerator {
     vector<int> reg;
     bool d = false;
 
-    // move one sequence position left and reset the current step
-    void move_position(int &s);
-
     // finish the swap of current numbers and sort all to the right (slow!)
     void re_order(const int &s);
 
