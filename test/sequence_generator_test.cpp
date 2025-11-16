@@ -7,19 +7,33 @@ using namespace std;
 
 vector<int> sequence_generator::check_initialization() {
     cout << "Testing SequenceGenerator initialization" << endl;
-    vector<int> success = {0, 1};
+    vector<int> success = {0, 3};
+    int length = 5;
+    SequenceGenerator s_init = SequenceGenerator(length);
 
-    // initialization
+    // length and sequence
     try {
-        int length = 5;
         vector<int> seq = {0, 1, 2, 3, 4};
-        string print_str_0 = "\033[31m0\033[0m,1,2,3,4";
-        string print_str_4 = "0,1,2,3,\033[31m4\033[0m";
-        SequenceGenerator s_init = SequenceGenerator(length);
         if(s_init.get_length() != length) throw string("length");
         if(s_init.get_sequence() != seq) throw string("sequence");
+        success[0]++;
+    } catch(string e) {
+        cout << "  -> Wrong value '" << e << "' for SequenceGenerator initialization" << endl;
+    }
+
+    // specific side values
+    try {
         if(s_init.get(1) != 1) throw string("get 1");
         if(s_init.get(3) != 3) throw string("get 3");
+        success[0]++;
+    } catch(string e) {
+        cout << "  -> Wrong value '" << e << "' for SequenceGenerator initialization" << endl;
+    }
+
+    // print output
+    try {
+        string print_str_0 = "\033[31m0\033[0m,1,2,3,4";
+        string print_str_4 = "0,1,2,3,\033[31m4\033[0m";
         if(s_init.print(0) != print_str_0) throw string("print 0");
         if(s_init.print(4) != print_str_4) throw string("print 4");
         success[0]++;
